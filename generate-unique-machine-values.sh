@@ -220,11 +220,6 @@ build_mac_serial () {
     stat ./macserial
 }
 
-download_vendor_mac_addresses () {
-    # download the MAC Address vendor list
-    [ -e "${MAC_ADDRESSES_FILE:=vendor_macs.tsv}" ] || wget -O "${MAC_ADDRESSES_FILE}" https://gitlab.com/wireshark/wireshark/-/raw/master/manuf
-}
-
 download_qcow_efi_folder () {
 
     export EFI_FOLDER=./OpenCore/EFI
@@ -279,6 +274,9 @@ generate_serial_sets () {
             # bash 3-5 compatible
             # UUID="${UUID^^}"
             UUID="$(tr '[:lower:]' '[:upper:]' <<< "${UUID}")"
+
+            MAC_ADDRESSES_FILE="$(dirname $0)/vendor_macs.tsv"
+            [ -e "${MAC_ADDRESSES_FILE:=vendor_macs.tsv}" ] && echo "vendor_macs.tsv OK."
 
             # get a random vendor specific MAC address.
             RANDOM_MAC_PREFIX="$(grep -e "${VENDOR_REGEX}" < "${MAC_ADDRESSES_FILE:=vendor_macs.tsv}" | sort --random-sort | head -n1)"
@@ -385,7 +383,6 @@ OUTPUT_DIRECTORY:   ${OUTPUT_DIRECTORY}
 EOF
     [ -d "${OUTPUT_DIRECTORY}" ] || mkdir -p "${OUTPUT_DIRECTORY}"
     [ -e ./macserial ] || build_mac_serial
-    download_vendor_mac_addresses
     if [ "${CREATE_BOOTDISKS}" ] || [ "${OUTPUT_BOOTDISK}" ]; then
         download_qcow_efi_folder
     fi
