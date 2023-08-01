@@ -275,6 +275,9 @@ generate_serial_sets () {
             # UUID="${UUID^^}"
             UUID="$(tr '[:lower:]' '[:upper:]' <<< "${UUID}")"
 
+            MAC_ADDRESSES_FILE="$(dirname $0)/vendor_macs.tsv"
+            [ -e "${MAC_ADDRESSES_FILE:=vendor_macs.tsv}" ] && echo "vendor_macs.tsv OK."
+
             # get a random vendor specific MAC address.
             RANDOM_MAC_PREFIX="$(grep -e "${VENDOR_REGEX}" < "${MAC_ADDRESSES_FILE:=vendor_macs.tsv}" | sort --random-sort | head -n1)"
             RANDOM_MAC_PREFIX="$(cut -d$'\t' -f1 <<< "${RANDOM_MAC_PREFIX}")"
